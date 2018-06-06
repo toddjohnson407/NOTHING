@@ -1,0 +1,232 @@
+<canvas id="shitCanvas" class="shitCanvas"></canvas>
+
+<style>
+  .shitCanvas {
+    background-color: black;
+  }
+
+  @media only screen and (max-device-width: 480px) {
+    .shitCanvas {
+      width: 100%;
+      height: 400px;
+    }
+  }
+</style>
+
+<script>
+   (function(){
+     'use strict';
+
+     var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+     window.requestAnimationFrame = requestAnimationFrame;
+
+     var canvas = document.getElementById('shitCanvas'),
+       ctx = canvas.getContext('2d'),
+       width = 500,
+       height = 400,
+       character = new Character(),
+       obstacle = new Obstacle(),
+       keys = [],
+       gravity = 0.25,
+       velocity = 50,
+       gameTime = 0,
+       waveTime = 0,
+       score = 0,
+       objectDirection = 'R',
+       wave = 1,
+       waveIncrement = 1,
+       gameOverMsg = 'SHIT ONE';
+
+     var touchDown = false;
+     var gameRunning = true;
+
+     canvas.width = width;
+     canvas.height = height;
+
+     canvas.addEventListener('click', function() {
+       if(!gameRunning) {
+         this.blur();
+         requestAnimationFrame(update);
+       }
+     }, false);
+
+     document.addEventListener('touchstart', function() {
+       touchDown = true;
+     }, false);
+
+     document.addEventListener('touchend', function() {
+       touchDown = false;
+     }, false);
+
+     function Character() {
+       this.x = 100;
+       this.y = height - 5;
+       this.width = 5;
+       this.height = 5;
+       this.speed = 3;
+       this.velX = 0;
+       this.velY = 0;
+       this.jumping = false;
+       this.colour = 'yellow';
+
+       this.draw = function (ctx) {
+         ctx.clearRect(0, 0, width, height);
+         ctx.fillStyle = this.colour;
+         ctx.fillRect(this.x, this.y, this.width, this.height);
+       };
+     }
+
+     function Obstacle() {
+       this.width = 50;
+       this.height = 50;
+       this.x = canvas.width;
+       this.y = height - this.height;
+       this.velX = 0;
+       this.colour = 'red';
+
+       this.draw = function (ctx) {
+         ctx.fillStyle = this.colour;
+         ctx.fillRect(this.x, this.y, this.width, this.height);
+       };
+     }
+
+     function gameover(ctx) {
+       gameRunning = false;
+       character = new Character();
+       obstacle = new Obstacle();
+       gameTime = 0;
+       score = 0;
+       newWave(5, 'red', canvas.width, 'R');
+       ctx.fillStyle = 'white';
+       ctx.font = '30px Arial';
+       ctx.fillText(gameOverMsg, 10, 60);
+       printInstructions();
+     }
+
+     function printInstructions() {
+       ctx.fillStyle = 'yellow';
+       ctx.font = '15px Arial';
+       ctx.fillText('Click to start.. space or tap to jump', 10, 80);
+     }
+
+     function motivate() {
+       ctx.fillStyle = 'white';
+       ctx.font = '30px Arial';
+       ctx.fillText('Nice score, shitpuffin', 10, 150);
+     }
+
+     function hasCollided(obstacle, character) {
+       return !(
+         ((obstacle.y + obstacle.height) < (character.y)) ||
+         (obstacle.y > (character.y + character.height))  ||
+         ((obstacle.x + obstacle.width) < character.x)    ||
+         (obstacle.x > (character.x + character.width))
+       );
+     }
+
+     function moveObject(fromDirection) {
+       if (fromDirection === 'R') {
+         // respawn character from left
+         character.x = 100;
+         // respawn from right  when it reaches end of canvas
+         if ((obstacle.x + obstacle.width) <= 0) {
+           obstacle.x = canvas.width;
+         }
+         // move object to the left
+         obstacle.x -= velocity;
+       } else {
+         // respawn character from right
+         character.x = canvas.width - 100;
+         // respawn object from left when it reaches end of canvas
+         if ((obstacle.x - obstacle.width) >= canvas.width) {
+           obstacle.x = -obstacle.width;
+         }
+         // move object to the right
+         obstacle.x += velocity;
+       }
+     }
+
+     function newWave(v, c, x, d) {
+       waveTime = 0;
+       velocity = v;
+       obstacle.colour = c;
+       obstacle.x = x;
+       objectDirection = d;
+
+       console.log('WAVE: ' + wave);
+     }
+
+     function update() {
+       if (keys[32] || touchDown) {
+         if (!character.jumping) {
+           character.jumping = true;
+           character.velY = -character.speed * 2;
+         }
+       }
+
+       character.velY += gravity;
+
+       character.x += character.velX;
+       character.y += character.velY;
+
+       if (character.y >= height - character.height) {
+         character.y = height - character.height;
+         character.jumping = false;
+       }
+
+       moveObject(objectDirection);
+
+       wave = (score === 750) ? 2 : (score === 1500) ? 3 : (score === 2250) ? 4 : (score === 3000) ? 5 : 1;
+
+       switch (wave) {
+         case 2:
+           newWave(5, 'blue', -obstacle.width, 'L');
+           break;
+         case 3:
+           newWave(5, 'orange', canvas.width, 'R');
+           break;
+         case 4:
+           newWave(5, 'white', -obstacle.width, 'L');
+           break;
+         case 5:
+           newWave(5, 'green', canvas.width, 'R');
+           break;
+       }
+
+       if (waveTime > 0 && waveTime % 300 === 0) {
+         velocity += 0.25;
+       }
+
+       gameTime += 1;
+       waveTime += 1;
+
+       if (gameTime % 10 === 0) {
+         score++;
+       }
+       if (hasCollided(obstacle, character)) {
+         gameover(ctx);
+       } else {
+         gameRunning = true;
+         character.draw(ctx);
+         obstacle.draw(ctx);
+         ctx.fillStyle = 'yellow';
+         ctx.font = '25px Arial';
+         ctx.fillText(score, 10, 25);
+
+         requestAnimationFrame(update);
+       }
+     }
+
+     addEventListener('keydown', function(e) {
+       keys[e.keyCode] = true;
+     });
+
+     addEventListener('keyup', function(e) {
+       keys[e.keyCode] = false;
+     });
+
+     addEventListener('load',function(){
+       update();
+     });
+   })();
+</script>

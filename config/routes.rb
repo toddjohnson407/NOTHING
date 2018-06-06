@@ -13,7 +13,9 @@ Rails.application.routes.draw do
   resources :maze
   resources :metal
   resources :nothing
-  resources :pigeon
+  resources :pigeon do
+    get 'junkie', to: 'pigeon#junkie'
+  end
   resources :seven
   resources :shatter
 
@@ -24,4 +26,5 @@ Rails.application.routes.draw do
   get "/sixth", to: "pages#sixth"
   get "/seventh", to: "pages#seventh"
   get "/eighth", to: "pages#eighth"
+  get '/nine', to: 'pages#nine'
 end

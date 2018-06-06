@@ -1,0 +1,2 @@
+class Shatter < ApplicationRecord
+end

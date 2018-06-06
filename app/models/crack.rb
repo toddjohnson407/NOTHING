@@ -1,0 +1,2 @@
+class Crack < ApplicationRecord
+end

@@ -26,6 +26,7 @@
        height = 400,
        character = new Character(),
        obstacle = new Obstacle(),
+       air = new Air(),
        keys = [],
        gravity = 0.25,
        velocity = 50,
@@ -61,8 +62,8 @@
      function Character() {
        this.x = 100;
        this.y = height - 5;
-       this.width = 5;
-       this.height = 5;
+       this.width = 20;
+       this.height = 20;
        this.speed = 3;
        this.velX = 0;
        this.velY = 0;
@@ -77,13 +78,26 @@
      }
 
      function Obstacle() {
-       this.width = 50;
-       this.height = 50;
+       this.width = 40;
+       this.height = 40;
        this.x = canvas.width;
        this.y = height - this.height;
        this.velX = 0;
        this.colour = 'red';
 
+       this.draw = function (ctx) {
+         ctx.fillStyle = this.colour;
+         ctx.fillRect(this.x, this.y, this.width, this.height);
+       };
+     }
+
+    function Air() {
+       this.width = 40;
+       this.height = 40;
+       this.x = canvas.width;
+       this.y = height - this.height;
+       this.velX = 0;
+       this.colour = 'red';
        this.draw = function (ctx) {
          ctx.fillStyle = this.colour;
          ctx.fillRect(this.x, this.y, this.width, this.height);

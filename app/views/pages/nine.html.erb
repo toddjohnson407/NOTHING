@@ -1,12 +1,12 @@
-<canvas id="shitCanvas" class="shitCanvas"></canvas>
+<canvas id="theCanvas" class="theCanvas"></canvas>
 
 <style>
-  .shitCanvas {
+  .theCanvas {
     background-color: black;
   }
 
   @media only screen and (max-device-width: 480px) {
-    .shitCanvas {
+    .theCanvas {
       width: 100%;
       height: 400px;
     }
@@ -20,7 +20,7 @@
      var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
      window.requestAnimationFrame = requestAnimationFrame;
 
-     var canvas = document.getElementById('shitCanvas'),
+     var canvas = document.getElementById('theCanvas'),
        ctx = canvas.getContext('2d'),
        width = 500,
        height = 400,
@@ -36,7 +36,7 @@
        objectDirection = 'R',
        wave = 1,
        waveIncrement = 1,
-       gameOverMsg = 'SHIT ONE';
+       gameOverMsg = 'the ONE';
 
      var touchDown = false;
      var gameRunning = true;
@@ -126,7 +126,7 @@
      function motivate() {
        ctx.fillStyle = 'white';
        ctx.font = '30px Arial';
-       ctx.fillText('Nice score, shitpuffin', 10, 150);
+       ctx.fillText('Nice score, thepuffin', 10, 150);
      }
 
      function hasCollided(obstacle, character) {
